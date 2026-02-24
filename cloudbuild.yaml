@@ -1,6 +1,6 @@
 steps:
 - name: 'python:3.8-slim'
-args: [python3, 'hello.py']
+  args: [python3, 'hello.py']
 
 options:
   logging: CLOUD_LOGGING_ONLY
