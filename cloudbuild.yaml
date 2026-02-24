@@ -1,6 +1,13 @@
 steps:
-- name: 'python:3.8-slim'
-  args: [python3, 'hello.py']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'northamerica-south1-docker.pkg.dev/gcp-demo-488323/python-app-artifacts/pyappimage:latest', '.']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'northamerica-south1-docker.pkg.dev/gcp-demo-488323/python-app-artifacts/pyappimage:latest']
+
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'gcloud'
+  args: ['run', 'deploy', 'pyflaskapp', '--image', 'northamerica-south1-docker.pkg.dev/gcp-demo-488323/python-app-artifacts/pyappimage:latest', '--region', 'northamerica-south1', '--platform', 'managed', '--allow-unauthenticated']
 
 options:
   logging: CLOUD_LOGGING_ONLY
