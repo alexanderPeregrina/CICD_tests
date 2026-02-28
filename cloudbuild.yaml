@@ -120,4 +120,5 @@ substitutions:
 #  _DEPLOY_REGION: us-central1
 
 options:
-  dynamicSubstitutions: true    
+  dynamicSubstitutions: true
+  logging: CLOUD_LOGGING_ONLY     
