@@ -76,6 +76,13 @@ steps:
       - |
         gcloud run deploy "${BRANCH_NAME}" --image  "${_IMAGE_PATH}" --region "${_DEPLOY_REGION}" --allow-unauthenticated
 
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    id: "test_feature"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gcloud run services describe "${BRANCH_NAME}" --region "${_DEPLOY_REGION}" --format='value(status.url)' | xargs -I {} curl -s "{}" | grep "Employee Data" && echo "Test passed" || (echo "Test failed" && exit 1)
 #
 #  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
 #    id: "test_feature"
