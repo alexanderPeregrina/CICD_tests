@@ -83,7 +83,16 @@ steps:
       - -c
       - |
         gcloud run services describe "${BRANCH_NAME}" --region "${_DEPLOY_REGION}" --format='value(status.url)' | xargs -I {} curl -s "{}" | grep "Employee Data" && echo "Test passed" || (echo "Test failed" && exit 1)
-#
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    id: "register_pipeline"
+    
+    entrypoint: bash
+    args:
+      - -c
+      - | 
+        gcloud deploy apply --file=./deploy/clouddeploy.yaml --region=$_DEPLOY_REGION --project=$PROJECT_ID
+    waitFor: ["test_feature"]
+         
 #  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
 #    id: "test_feature"
 #    entrypoint: bash
