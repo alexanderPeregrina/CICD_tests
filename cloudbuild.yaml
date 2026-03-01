@@ -10,7 +10,7 @@ steps:
         echo "$${lint_status:-0}" > lint_exit_code.txt
         echo "lint test exited with code $${lint_status:-0}"
     allowFailure: true    
-  
+
   - name: 'gcr.io/cloud-builders/gsutil'
     id: "upload-lint-artifacts"
     entrypoint: "bash"
@@ -61,11 +61,11 @@ steps:
 
   - name: "gcr.io/cloud-builders/docker"  
     id: "build"
-    args: ['build', '-t', '${_IMAGE_PATH}', '.' ]
+    args: ['build', '-t', '$_IMAGE_PATH', '.' ]
 
   - name: "gcr.io/cloud-builders/docker"
     id: "push"
-    args: ['push', '${_IMAGE_PATH}']
+    args: ['push', '$_IMAGE_PATH']
     waitFor: ["build"]  
 
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
@@ -74,7 +74,10 @@ steps:
     args:
       - -c
       - |
-        gcloud run deploy "${BRANCH_NAME}" --image  "${_IMAGE_PATH}" --region "${_DEPLOY_REGION}" --allow-unauthenticated
+        gcloud run deploy "$BRANCH_NAME" \
+          --image $_IMAGE_PATH \
+          --region $_DEPLOY_REGION \
+          --allow-unauthenticated
 
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: "test_feature"
@@ -82,17 +85,22 @@ steps:
     args:
       - -c
       - |
-        gcloud run services describe "${BRANCH_NAME}" --region "${_DEPLOY_REGION}" --format='value(status.url)' | xargs -I {} curl -s "{}" | grep "Employee Data" && echo "Test passed" || (echo "Test failed" && exit 1)
+        gcloud run services describe "$BRANCH_NAME" \
+          --region $_DEPLOY_REGION \
+          --format='value(status.url)' | \
+          xargs -I {} curl -s "{}" | grep "Employee Data" && echo "Test passed" || (echo "Test failed" && exit 1)
+
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: "register_pipeline"
-    
     entrypoint: bash
     args:
       - -c
-      - | 
-        gcloud deploy apply --file=./deploy/clouddeploy.yaml --region=$_DEPLOY_REGION --project=$PROJECT_ID --region=$_DEPLOY_REGION
+      - |
+        gcloud deploy apply --file=./deploy/clouddeploy.yaml \
+          --region=$_DEPLOY_REGION \
+          --project=$PROJECT_ID
     waitFor: ["test_feature"]
-         
+
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'create_release'
     entrypoint: 'bash'
@@ -100,18 +108,18 @@ steps:
       - '-c'
       - |
         gcloud deploy releases create emp-portal-$SHORT_SHA \
-        --delivery-pipeline=emp-portal-pipeline \
-        --region=$_DEPLOY_REGION \
-        --project=$PROJECT_ID \
-        --images app-image="$_IMAGE_PATH"
+          --delivery-pipeline=emp-portal-pipeline \
+          --region=$_DEPLOY_REGION \
+          --project=$PROJECT_ID \
+          --images=app-image=$_IMAGE_PATH
     waitFor: ["register_pipeline"]
 
 substitutions:
   _LOCATION: northamerica-south1-docker.pkg.dev
   _IMAGE: emp-portal-artifacts/emp-portal-image
-  _IMAGE_PATH: ${_LOCATION}/${PROJECT_ID}/${_IMAGE}:${BRANCH_NAME}  
+  _IMAGE_PATH: $_LOCATION/$PROJECT_ID/$_IMAGE:$BRANCH_NAME  
   _DEPLOY_REGION: us-central1
 
 options:
   dynamicSubstitutions: true
-  logging: CLOUD_LOGGING_ONLY     
+  logging: CLOUD_LOGGING_ONLY
