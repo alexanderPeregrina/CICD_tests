@@ -115,9 +115,10 @@ steps:
     waitFor: ["register_pipeline"]
 
 substitutions:
-  _LOCATION: northamerica-south1-docker.pkg.dev
-  _IMAGE: emp-portal-artifacts/emp-portal-image
-  _IMAGE_PATH: $_LOCATION/$PROJECT_ID/$_IMAGE:$BRANCH_NAME  
+  _REGION: us-central1
+  _REPO: emp-portal-artifacts
+  _IMAGE: emp-portal-image
+  _IMAGE_PATH: $_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO/$_IMAGE:$BRANCH_NAME
   _DEPLOY_REGION: us-central1
 
 options:
