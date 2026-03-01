@@ -73,11 +73,7 @@ steps:
     entrypoint: bash
     args:
       - -c
-      - |
-        if [[ "$BRANCH_NAME" =~ ^feature-.*$ ]]
-        then
-          gcloud run deploy "${BRANCH_NAME}" --image  "${_IMAGE_PATH}" --region "${_DEPLOY_REGION}" --allow-unauthenticated
-        fi
+        gcloud run deploy "${BRANCH_NAME}" --image  "${_IMAGE_PATH}" --region "${_DEPLOY_REGION}" --allow-unauthenticated
 #
 #  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
 #    id: "test_feature"
