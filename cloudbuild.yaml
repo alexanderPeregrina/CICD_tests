@@ -99,8 +99,12 @@ steps:
     args:
       - '-c'
       - |
-        gcloud deploy releases create emp-portal-$SHORT_SHA --delivery-pipeline emp-portal-pipeline --region $_DEPLOY_REGION --images app-image="$_IMAGE_PATH"
-
+        gcloud deploy releases create emp-portal-$SHORT_SHA \
+        --delivery-pipeline=emp-portal-pipeline \
+        --region=$_DEPLOY_REGION \
+        --project=$_PROJECT_ID
+        --images app-image="$_IMAGE_PATH"
+    waitFor: ["register_pipeline"]
 
 substitutions:
   _LOCATION: northamerica-south1-docker.pkg.dev
