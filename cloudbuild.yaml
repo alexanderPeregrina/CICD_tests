@@ -102,7 +102,7 @@ steps:
         gcloud deploy releases create emp-portal-$SHORT_SHA \
         --delivery-pipeline=emp-portal-pipeline \
         --region=$_DEPLOY_REGION \
-        --project=$_PROJECT_ID
+        --project=$PROJECT_ID
         --images app-image="$_IMAGE_PATH"
     waitFor: ["register_pipeline"]
 
