@@ -73,7 +73,9 @@ steps:
     entrypoint: bash
     args:
       - -c
+      - |
         gcloud run deploy "${BRANCH_NAME}" --image  "${_IMAGE_PATH}" --region "${_DEPLOY_REGION}" --allow-unauthenticated
+
 #
 #  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
 #    id: "test_feature"
