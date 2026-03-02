@@ -100,9 +100,7 @@ steps:
     args:
       - '-c'
       - |
-          SHORT_BUILD=${BUILD_ID:0:8}
-
-          gcloud deploy releases create emp-portal-$SHORT_SHA-$SHORT_BUILD \
+          gcloud deploy releases create emp-portal-$SHORT_SHA-${BUILD_ID:0:8}\
           --delivery-pipeline=emp-portal-pipeline \
           --region=us-central1 \
           --project=$PROJECT_ID \
