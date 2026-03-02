@@ -19,7 +19,7 @@ metadata:
   name: staging-env
 description: Cloud run staging service
 run:
-  location: projects/${PROJECT_ID}/locations/${_DEPLOY_REGION}
+  location: projects/${PROJECT_ID}/locations/us-central1
 
 ---
 
@@ -29,7 +29,7 @@ metadata:
   name: production-env
 description: Cloud run production service
 run:
-  location: projects/${PROJECT_ID}/locations/${_DEPLOY_REGION}
+  location: projects/${PROJECT_ID}/locations/us-central1
 
 # ---
 

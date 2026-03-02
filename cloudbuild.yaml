@@ -83,6 +83,7 @@ steps:
       - -c
       - |
         gcloud run services describe "${BRANCH_NAME}" --region "${_DEPLOY_REGION}" --format='value(status.url)' | xargs -I {} curl -s "{}" | grep "Employee Data" && echo "Test passed" || (echo "Test failed" && exit 1)
+  
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: "register_pipeline"
     
@@ -90,7 +91,7 @@ steps:
     args:
       - -c
       - | 
-        gcloud deploy apply --file=./deploy/clouddeploy.yaml --region=$_DEPLOY_REGION --project=$PROJECT_ID
+        gcloud deploy apply --file=./deploy/clouddeploy.yaml
     waitFor: ["test_feature"]
          
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -101,7 +102,6 @@ steps:
       - |
         gcloud deploy releases create emp-portal-$SHORT_SHA \
         --delivery-pipeline=emp-portal-pipeline \
-        --region=$_DEPLOY_REGION \
         --project=$PROJECT_ID \
         --images app-image="$_IMAGE_PATH"
     waitFor: ["register_pipeline"]
