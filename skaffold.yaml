@@ -13,5 +13,10 @@ profiles:
     rawYaml:
     - ./deploy/deploy-production.yaml      
 
+# to deploy in GKE
 deploy:
-  cloudrun: {}    
+  kubectl: {}
+  
+# To deploy on cloud run
+#deploy:
+#  cloudrun: {}    

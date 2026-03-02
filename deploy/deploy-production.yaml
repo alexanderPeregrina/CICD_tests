@@ -1,15 +1,49 @@
-apiVersion: serving.knative.dev/v1
-kind: Service
-metadata: 
-  name: production-app
+# apiVersion: serving.knative.dev/v1
+# kind: Service
+# metadata: 
+#   name: production-app
+# spec:
+#   template:
+#     spec:
+#       containers: 
+#       - image: app-image  
+#         ports:
+#         - containerPort: 80
+#       resources:
+#         limits:
+#           cpu: 2000m
+#           memory: 1024Mi  
+
+# To run on GKE:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emp-portal-production-deployment
 spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: production-app
   template:
+    metadata:
+      labels:
+        app: production-app
     spec:
-      containers: 
-      - image: app-image  
+      containers:
+      - name: emp-portal-production-container
+        image: app-image
         ports:
         - containerPort: 80
-      resources:
-        limits:
-          cpu: 2000m
-          memory: 1024Mi  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emp-production-service
+spec:
+  selector:
+    app: production-app
+  type: LoadBalancer
+  ports:
+    - protocol: http
+      port: 80
+      targetPort: 80

@@ -1,15 +1,50 @@
-apiVersion: serving.knative.dev/v1
-kind: Service
-metadata: 
-  name: staging-app
+# To run on Cloud RUN:
+# apiVersion: serving.knative.dev/v1
+# kind: Service
+# metadata: 
+#   name: staging-app
+# spec:
+#   template:
+#     spec:
+#       containers: 
+#       - image: app-image  
+#         ports:
+#         - containerPort: 80
+#       resources:
+#         limits:
+#           cpu: 1000m
+#           memory: 512Mi  
+# To run on GKE:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emp-portal-staging-deployment
 spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: staging-app
   template:
+    metadata:
+      labels:
+        app: staging-app
     spec:
-      containers: 
-      - image: app-image  
+      containers:
+      - name: emp-portal-staging-container
+        image: app-image
         ports:
         - containerPort: 80
-      resources:
-        limits:
-          cpu: 1000m
-          memory: 512Mi  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emp-staging-service
+spec:
+  selector:
+    app: staging-app
+  type: LoadBalancer
+  ports:
+    - protocol: http
+      port: 80
+      targetPort: 80
+
