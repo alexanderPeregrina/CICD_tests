@@ -74,7 +74,9 @@ steps:
     args:
       - -c
       - |
-        gcloud run deploy "${BRANCH_NAME}" --image  "${_IMAGE_PATH}" --region "${_DEPLOY_REGION}" --allow-unauthenticated
+        if [[ "$BRANCH_NAME" =~ ^feature-.*$ ]]; then
+          gcloud run deploy "${BRANCH_NAME}" --image  "${_IMAGE_PATH}" --region "${_DEPLOY_REGION}" --allow-unauthenticated
+        fi
 
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: "test_feature"
@@ -82,17 +84,22 @@ steps:
     args:
       - -c
       - |
-        gcloud run services describe "${BRANCH_NAME}" --region "${_DEPLOY_REGION}" --format='value(status.url)' | xargs -I {} curl -s "{}" | grep "Employee Data" && echo "Test passed" || (echo "Test failed" && exit 1)
+        if [[ "$BRANCH_NAME" =~ ^feature-.*$ ]]; then
+          gcloud run services describe "${BRANCH_NAME}" --region "${_DEPLOY_REGION}" --format='value(status.url)' | xargs -I {} curl -s "{}" | grep "Employee Data" && echo "Test passed" || (echo "Test failed" && exit 1)
+        fi
   
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: "register_pipeline"
-    
     entrypoint: bash
     args:
       - -c
-      - | 
-        gcloud deploy apply --file=./deploy/clouddeploy.yaml --region=$_DEPLOY_REGION --project=$PROJECT_ID
-    waitFor: ["test_feature"]
+      - |
+        if [[ "$BRANCH_NAME" == "main" ]]; then
+           echo "Registering pipeline for main branch..."
+           gcloud deploy apply --file=./deploy/clouddeploy.yaml --region=$_DEPLOY_REGION --project=$PROJECT_ID
+        else
+           echo "Skipping pipeline registration for non-main branch."
+        fi
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'create_release'
@@ -100,12 +107,13 @@ steps:
     args:
       - '-c'
       - |
+        if [[ "$BRANCH_NAME" == "main" ]]; then
           gcloud deploy releases create emp-portal-$SHORT_SHA \
           --delivery-pipeline=emp-portal-pipeline \
           --region=us-central1 \
           --project=$PROJECT_ID \
           --images app-image="$_IMAGE_PATH"
-    waitFor: ["register_pipeline"]
+        fi
   
 substitutions:
   _LOCATION: northamerica-south1-docker.pkg.dev
