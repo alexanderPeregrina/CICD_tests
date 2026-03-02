@@ -91,9 +91,9 @@ steps:
     args:
       - -c
       - | 
-        gcloud deploy apply --file=./deploy/clouddeploy.yaml
+        gcloud deploy apply --file=./deploy/clouddeploy.yaml --region=$_DEPLOY_REGION --project=$PROJECT_ID
     waitFor: ["test_feature"]
-         
+
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'create_release'
     entrypoint: 'bash'
