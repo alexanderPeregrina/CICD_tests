@@ -44,7 +44,7 @@ spec:
     app: staging-app
   type: LoadBalancer
   ports:
-    - protocol: http
+    - protocol: TCP
       port: 80
       targetPort: 80
 
